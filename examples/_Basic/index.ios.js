@@ -485,4 +485,4 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent('Basic', () => App);
+AppRegistry.registerComponent('RnSailor', () => App);
