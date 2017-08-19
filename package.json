@@ -19,13 +19,15 @@
     "url": "https://github.com/sowdri/rn-sailor/issues"
   },
   "homepage": "https://github.com/sowdri/rn-sailor#readme",
-  "dependencies": {
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-router-native": "^4.1.1"
+  },
+  "devDependencies": {
     "@types/react": "^16.0.2",
     "@types/react-native": "^0.47.5",
     "@types/react-router": "^4.0.15",
-    "@types/react-router-native": "^4.0.1",
-    "react": "16.0.0-alpha.12",
-    "react-native": "^0.47.1",
-    "react-router-native": "^4.1.1"
+    "@types/react-router-native": "^4.0.1"
   }
 }

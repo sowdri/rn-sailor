@@ -252,10 +252,10 @@ export default class AnimatedScreen extends Component<Props, State> {
     return null;
   };
 
+  // component={Component} progress={progress} {...{ match, location, animating }} {...rest}
+  
   render() {
     const { transitionState, mounted } = this.state;
-
-    // component={Component} progress={progress} {...{ match, location, animating }} {...rest}
 
     // at this state the component is not mounted and not rendered
     if (!mounted) return null;
@@ -274,6 +274,10 @@ export default class AnimatedScreen extends Component<Props, State> {
       ]
     };
 
+    /**
+     * If component is supplied, then return the component
+     * Else if render method is supplied, then render the component returned by render method
+     */
     const Component = this.component();
 
     return (
