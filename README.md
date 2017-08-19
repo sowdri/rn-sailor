@@ -14,7 +14,7 @@ Navigation for react-native based on react-router(v4)
 
 This library is a set of components that works together to create the transition animations. This section explains the functionality of each of the components. 
 
-```
+```jsx
 const App = () =>
   <NativeRouter initialEntries={[{ pathname: '/', state: { title: 'Hello' } }]} initialIndex={0}>
     <AnimationContainer>
@@ -51,11 +51,20 @@ The animation container takes a `duration` (TBI) for ex: `300ms`. AnimationConta
 
 ### AnimatedRoute
 
+AnimatedRoute is a simple wrapper over react-router `Route` component. In fact the total implementation is just the following lines. 
 
+> `rest` params is not clear at the moment, that has to be refined.
+
+```jsx
+const AnimatedRoute = ({ path, ...rest }) =>
+  <Route path={path}>
+    {({ match, location }) => {
+      return <AnimatedScreen {...rest} {...{ path, match, location }} />;
+    }}
+  </Route>;
+```
 
 ### AnimatedScreen
-
-
 
 
 `AnimatedScreen` is a simple component with 2 state variables

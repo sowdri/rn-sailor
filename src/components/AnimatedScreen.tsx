@@ -26,9 +26,12 @@ interface Props {
   render: (props: { path: string; match: ReactRouter.match<any>; location: History.Location }) => React.Component;
 }
 
+/**
+ * transitionState - screen will either be coming-in, outgoing or just there or just not there
+ */
 interface State {
   mounted: boolean;
-  transitionDirection: '' | 'in' | 'out'; // could be either in/out or empty if the screen just appears
+  transitionState: '' | 'incoming' | 'outgoing';
   width: number;
   height: number;
 }
@@ -37,21 +40,21 @@ export default class AnimatedScreen extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    // this route matchs straight-away, should be a default route
+    // this route matches straight-away, should be a default route
     if (props.match) {
       /**
        * no transition-direction here, the view would just appear
        */
       this.state = {
         mounted: true,
-        transitionDirection: '', // could be either in/out or empty if the screen just appears
+        transitionState: '', // could be either in/out or empty if the screen just appears
         width: 0,
         height: 0
       };
     } else {
       this.state = {
         mounted: false,
-        transitionDirection: '', // transition doesn't matter if not mounted
+        transitionState: '', // transition doesn't matter if not mounted
         width: 0,
         height: 0
       };
@@ -69,7 +72,7 @@ export default class AnimatedScreen extends Component<Props, State> {
 
   componentWillReceiveProps(nextProps: Props) {
     const props = this.props;
-    const { transitionDirection } = this.state;
+    const { transitionState } = this.state;
     const animationEnded = props.animating && !nextProps.animating;
 
     // the following are the possibilities
@@ -84,17 +87,17 @@ export default class AnimatedScreen extends Component<Props, State> {
      * at which point the view has to be unmounted.
      */
     if (animationEnded) {
-      // simple logic, if animation ends, then transition should be empty
-      this.setState({
-        transitionDirection: ''
-      });
-
-      // if transition is out, then animation is ended, so unmount the view
-      if (transitionDirection == 'out') {
+      // if screen is outgoing and if the animation is ended, unmount the view
+      if (transitionState == 'outgoing') {
         this.setState({
           mounted: false
         });
       }
+
+      // simple logic, if animation ends, then transition should be empty
+      this.setState({
+        transitionState: ''
+      });
 
       return;
     }
@@ -102,7 +105,7 @@ export default class AnimatedScreen extends Component<Props, State> {
     // transition out
     if (props.match && !nextProps.match) {
       this.setState({
-        transitionDirection: 'out'
+        transitionState: 'outgoing'
       });
       return;
     }
@@ -111,7 +114,7 @@ export default class AnimatedScreen extends Component<Props, State> {
     if (!props.match && nextProps.match) {
       this.setState({
         mounted: true,
-        transitionDirection: 'in'
+        transitionState: 'incoming'
       });
       return;
     }
@@ -119,7 +122,7 @@ export default class AnimatedScreen extends Component<Props, State> {
 
   slideInLeft = () => {
     const { component: Component, location, progress } = this.props;
-    const { transitionDirection, mounted, width, height } = this.state;
+    const { transitionState, mounted, width, height } = this.state;
 
     return progress.interpolate({
       inputRange: [0, 1],
@@ -129,7 +132,7 @@ export default class AnimatedScreen extends Component<Props, State> {
 
   slideInRight = () => {
     const { component: Component, location, progress } = this.props;
-    const { transitionDirection, mounted, width, height } = this.state;
+    const { transitionState, mounted, width, height } = this.state;
 
     return progress.interpolate({
       inputRange: [0, 1],
@@ -139,7 +142,7 @@ export default class AnimatedScreen extends Component<Props, State> {
 
   slideOutLeft = () => {
     const { component: Component, location, progress } = this.props;
-    const { transitionDirection, mounted, width, height } = this.state;
+    const { transitionState, mounted, width, height } = this.state;
 
     return progress.interpolate({
       inputRange: [0, 1],
@@ -149,7 +152,7 @@ export default class AnimatedScreen extends Component<Props, State> {
 
   slideOutRight = () => {
     const { component: Component, location, progress } = this.props;
-    const { transitionDirection, mounted, width, height } = this.state;
+    const { transitionState, mounted, width, height } = this.state;
 
     return progress.interpolate({
       inputRange: [0, 1],
@@ -157,38 +160,68 @@ export default class AnimatedScreen extends Component<Props, State> {
     });
   };
 
+  /**
+   * User can specify animationIn and animationOut
+   * animationIn will decide the animation for the incoming screen
+   * animationOut will decide the animation for the outgoing screen
+   */
   translateX = () => {
     const { location, progress } = this.props;
-    const { transitionDirection } = this.state;
+    const { transitionState } = this.state;
 
     // no transition
-    if (!transitionDirection) return 0;
+    if (!transitionState) return 0;
 
     // the component is mounted, either on screen, or animating-in or animating-out
     // if animating-in, will just appear after the animation is over
     // if animating-out, will become invisible and hence will not be rendered after the animation is over
 
-    const direction = (location.state && location.state.direction) || 'forward';
+    const animationIn = (location.state && location.state.animationIn) || 'slideInRight';
+    const animationOut = (location.state && location.state.animationOut) || 'slideOutLeft';
+
+    // TODO
+    // const direction = (location.state && location.state.direction) || 'forward';
 
     /**
      * based on direction and if the screen is animating in/out we have to choose the translateX value
      */
     var translateX;
 
-    if (transitionDirection == 'in')
-      if (direction == 'forward') return this.slideInRight();
-      else return this.slideInLeft();
-
-    if (transitionDirection == 'out') {
-      // animating-out
-      if (direction == 'forward') return this.slideOutLeft();
-      else return this.slideOutRight();
+    if (transitionState == 'incoming') {
+      switch (animationIn) {
+        case 'none':
+          return 0;
+        case 'slideInRight':
+          return this.slideInRight();
+        case 'slideInLeft':
+          return this.slideInLeft();
+        default:
+          console.error('Unknown animationIn ' + animationIn);
+          return 0;
+      }
     }
 
-    console.error('Unknown transition direction ' + transitionDirection);
+    if (transitionState == 'outgoing') {
+      switch (animationOut) {
+        case 'none':
+          return 0;
+        case 'slideOutRight':
+          return this.slideOutRight();
+        case 'slideOutLeft':
+          return this.slideOutLeft();
+        default:
+          console.error('Unknown animationIn ' + animationIn);
+          return 0;
+      }
+    }
+
+    console.error('Unknown transition state ' + transitionState);
     return 0;
   };
 
+  /**
+   * Will return the component that will be rendered. 
+   */
   component = (): React.ClassType<any, any, any> => {
     const { component, render, path, match, location } = this.props;
 
@@ -220,7 +253,7 @@ export default class AnimatedScreen extends Component<Props, State> {
   };
 
   render() {
-    const { transitionDirection, mounted } = this.state;
+    const { transitionState, mounted } = this.state;
 
     // component={Component} progress={progress} {...{ match, location, animating }} {...rest}
 
