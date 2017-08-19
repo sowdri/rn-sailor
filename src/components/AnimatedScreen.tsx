@@ -1,7 +1,43 @@
-export default class AnimatedScreen extends React.Component {
-  constructor(props) {
+import React, { Component } from 'react';
+import ReactNative, { Animated } from 'react-native';
+import { LayoutEvent } from '../models';
+import { NativeRouter, Route, Link, Switch, withRouter, MemoryRouter } from 'react-router-native';
+
+import * as ReactRouter from 'react-router';
+import * as History from 'history';
+
+/**
+ * path, match and location are what is passed down from react-router
+ * progress and animating is to co-ordinate animation, passed down from AnimationContainer
+ * component is the actual component to render
+ * render is a function, that returns a component to render
+ * 
+ * component and render both stands for the component to be rendered
+ * if component is present, it will be used
+ * otherwise render will be used
+ */
+interface Props {
+  path: string;
+  match: ReactRouter.match<any>;
+  location: History.Location;
+  progress: Animated.Value;
+  animating: boolean;
+  component: Component;
+  render: (props: { path: string; match: ReactRouter.match<any>; location: History.Location }) => React.Component;
+}
+
+interface State {
+  mounted: boolean;
+  transitionDirection: '' | 'in' | 'out'; // could be either in/out or empty if the screen just appears
+  width: number;
+  height: number;
+}
+
+export default class AnimatedScreen extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
+    // this route matchs straight-away, should be a default route
     if (props.match) {
       /**
        * no transition-direction here, the view would just appear
@@ -22,26 +58,16 @@ export default class AnimatedScreen extends React.Component {
     }
   }
 
-  setSize = event => {
+  setSize = (event: LayoutEvent) => {
     const w = event.nativeEvent.layout.width;
     const h = event.nativeEvent.layout.height;
-    console.log(w, h);
     this.setState({
       width: w,
       height: h
     });
   };
 
-  // static propTypes = {
-  //   Component: PropTypes.node,
-  //   progress: PropTypes.object,
-  //   animating: PropTypes.bool,
-  //   match
-  //   location
-
-  // }
-
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     const props = this.props;
     const { transitionDirection } = this.state;
     const animationEnded = props.animating && !nextProps.animating;
@@ -163,8 +189,9 @@ export default class AnimatedScreen extends React.Component {
     return 0;
   };
 
-  component = () => {
+  component = (): React.ClassType<any, any, any> => {
     const { component, render, path, match, location } = this.props;
+
     /**
      * If component present, use it.
      * 
@@ -173,6 +200,11 @@ export default class AnimatedScreen extends React.Component {
      *
      * <Route component> takes precendence over <Route render> so don’t use both in the same <Route>.
      */
+    if (component && render)
+      console.error(
+        'Both component and render defined. Using component. Check AnimatedRoute definition for path ' + path
+      );
+
     if (component) return component;
 
     if (render)
