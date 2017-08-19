@@ -1,6 +1,6 @@
 {
   "name": "rn-sailor",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "navigation for react-native based on react-router (v4)",
   "main": "index.js",
   "directories": {
