@@ -67,12 +67,8 @@ const AnimatedRoute = ({ path, ...rest }) =>
 ### AnimatedScreen
 
 
-`AnimatedScreen` is a simple component with 2 state variables
+`AnimatedScreen` is used by AnimatedRoute to perform the transition animations and to render the screen. This component performs the following: 
 
-mounted: boolean
-transition: '' | 'in' | 'out'
-
-mounted - determines if the wrapped component is mounted or not. If unmounted, it will be not be rendered.
-transition - holds the current transition
-        - if empty, then no transition is in progress
-
+- Wraps around the component to be rendered
+- Manages the transition animations (both in and out)
+- Unmounts the outgoing components after the transition animation is over

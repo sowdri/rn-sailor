@@ -22,8 +22,8 @@ interface Props {
   location: History.Location;
   progress: Animated.Value;
   animating: boolean;
-  component: Component;
-  render: (props: { path: string; match: ReactRouter.match<any>; location: History.Location }) => React.Component;
+  component?: Component;
+  render?: (props: { path: string; match: ReactRouter.match<any>; location: History.Location }) => React.Component;
 }
 
 /**
