@@ -3,10 +3,8 @@
   "version": "0.0.0",
   "description": "navigation for react-native based on react-router (v4)",
   "main": "index.js",
-  "directories": {
-    "example": "examples"
-  },
   "scripts": {
+    "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && npm cache clear --force",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,6 +26,9 @@
     "@types/react": "^16.0.2",
     "@types/react-native": "^0.47.5",
     "@types/react-router": "^4.0.15",
-    "@types/react-router-native": "^4.0.1"
+    "@types/react-router-native": "^4.0.1",
+    "react": "^16.0.2",
+    "react-native": "^0.47.5",
+    "react-router-native": "^4.1.1"
   }
 }
