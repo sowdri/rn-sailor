@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/sowdri/rn-sailor/issues"
   },
-  "homepage": "https://github.com/sowdri/rn-sailor#readme"
+  "homepage": "https://github.com/sowdri/rn-sailor#readme",
+  "dependencies": {
+    "react": "16.0.0-alpha.12",
+    "react-native": "^0.47.1"
+  }
 }
