@@ -11,6 +11,7 @@ var { height, width } = Dimensions.get('window');
 
 import { NativeRouter, Route, Link, Switch, withRouter, MemoryRouter } from 'react-router-native';
 import NavigationBar from 'react-native-navbar';
+import { AnimatedScreen } from 'rn-sailor';
 /**
  * Design
  *
@@ -32,7 +33,7 @@ import NavigationBar from 'react-native-navbar';
  * 
  * 
  */
-class AnimatedScreen extends React.Component {
+class AnimatedScreen1 extends React.Component {
   constructor(props) {
     super(props);
 
